@@ -37,7 +37,8 @@ namespace TheDotFactory
         public enum CommentStyle
         {
             C,               // c style comments - /* */
-            Cpp              // C++ style - //
+            Cpp,             // C++ style - //
+            Python           // Python style - #
         }
 
         // Bit Layout

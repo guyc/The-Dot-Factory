@@ -1105,7 +1105,7 @@ namespace TheDotFactory
             for (int row = 0; row != height; ++row)
             {
                 // each row is started with a line comment
-                visualizer[row] = "// ";
+                visualizer[row] = m_commentStartString;
                 
                 // iterator over columns
                 for (int col = 0; col != width; ++col)
@@ -1123,6 +1123,9 @@ namespace TheDotFactory
                     // check if bit is set
                     visualizer[row] += (bitMask & page) != 0 ? m_outputConfig.bmpVisualizerChar : " ";
                 }
+
+                visualizer[row] += m_commentEndString;
+
             }
 
             // for debugging
@@ -1935,6 +1938,17 @@ namespace TheDotFactory
                         break;
                     }
 
+                    if (token == "#")
+                    {
+                        // Find the start of the comment and then extract the whole comment.
+                        int index = line.IndexOf("#");
+                        string comment = line.Substring(index, line.Length - index);
+                        outputTextBox.SelectionColor = Color.Green;
+                        outputTextBox.SelectionFont = fRegular;
+                        outputTextBox.SelectedText = comment;
+                        break;
+                    }   
+
                     // Check for a comment. TODO: terminate coloring
                     if (token == "/*" || token.StartsWith("/*"))
                     {
@@ -2025,20 +2039,26 @@ namespace TheDotFactory
         // set comment strings according to config
         private void updateCommentStrings()
         {
-            if (m_outputConfig.commentStyle == OutputConfiguration.CommentStyle.Cpp)
+            switch (m_outputConfig.commentStyle)
             {
-                // strings for comments
-                m_commentStartString = "// ";
-                m_commentBlockEndString = m_commentBlockMiddleString = m_commentStartString;
-                m_commentEndString = "";
-            }
-            else
-            {
-                // strings for comments
-                m_commentStartString = "/* ";
-                m_commentBlockMiddleString = "** ";
-                m_commentEndString = " */";
-                m_commentBlockEndString = "*/";
+                case OutputConfiguration.CommentStyle.Cpp:
+                    // strings for comments
+                    m_commentStartString = "// ";
+                    m_commentBlockEndString = m_commentBlockMiddleString = m_commentStartString;
+                    m_commentEndString = "";
+                    break;
+                case OutputConfiguration.CommentStyle.C:
+                    // strings for comments
+                    m_commentStartString = "/* ";
+                    m_commentBlockMiddleString = "** ";
+                    m_commentEndString = " */";
+                    m_commentBlockEndString = "*/";
+                    break;
+                case OutputConfiguration.CommentStyle.Python:
+                    m_commentStartString = "# ";
+                    m_commentBlockEndString = m_commentBlockMiddleString = m_commentStartString;
+                    m_commentEndString = "";
+                    break;
             }
         }
         

@@ -1696,6 +1696,13 @@ namespace TheDotFactory
         // generate the required output for text
         private void generateOutputForFont(Font font, ref string resultTextSource, ref string resultTextHeader)
         {
+            // populate the font info
+            FontInfo fontInfo = populateFontInfo(font);
+
+            PythonFontFile file = new PythonFontFile(m_outputConfig, fontInfo);
+            resultTextSource = file.Generate();
+            return;
+
             // do nothing if no chars defined
             if (txtInputText.Text.Length == 0) return;
             
@@ -1713,12 +1720,18 @@ namespace TheDotFactory
                                                     m_commentEndString);
             }
 
-            // populate the font info
-            FontInfo fontInfo = populateFontInfo(font);
-            
+
+            generateClassHeader(fontInfo, ref resultTextSource);
+
             // We now have all information required per font and per character. 
             // time to generate the string
             generateStringsFromFontInfo(fontInfo, ref resultTextSource, ref resultTextHeader);
+             
+        }
+
+        private void generateClassHeader(FontInfo fontInfo, ref string resultTextSource)
+        {
+            resultTextSource += String.Format("class {0}{1}:", fontInfo.font.Name, Math.Round(fontInfo.font.Size));
         }
 
         // generate the required output for image
